@@ -60,7 +60,7 @@ We have a course assistant named `rover`. It will automatize the part of your so
 cargo install --path tools/rover
 ```
 
-Probably, you'll need `libssl-dev` installed to build `rover`. Install it if needed.
+You may need to additionally install `libssl-dev` and `pkg-config` to build `rover`. Install it if needed.
 
 From this moment, you can call it from any place you want!
 
@@ -70,13 +70,9 @@ To uninstall it later, run this line from anyplace:
 cargo uninstall rover
 ```
 
-### Step 5 - First solution
+### Step 5 - Student CI
 
-Read the document about [solving and submitting problems](solving.md). Solve the [add](problems/tutorial/add) problem.
-
-### Step 6 - Student CI
-
-1. Clone your repository **near the course repository** in the folder named solutions (use `username-practice` repository):
+1. Clone your repository **next to the course repository** in the folder named **solutions** (use `username-practice` repository):
 
     ```shell
     git clone YOUR_SOLUTIONS_REPOSITORY solutions
