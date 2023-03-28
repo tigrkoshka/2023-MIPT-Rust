@@ -49,15 +49,14 @@ Clone the repository:
 
 ```shell
 git clone https://gitlab.com/iDang3r/rust2023
-cd rust2023
 ```
 
 ### Step 4 - Rover tool
 
-We have a course assistant named `rover`. It will automatize the part of your solving routine. Go to build and install it with the command:
+We have a course assistant named `rover`. It will automatize the part of your solving routine. So install it with the command:
 
 ```shell
-cargo install --path tools/rover
+cargo install --path rust2023/tools/rover
 ```
 
 You may need to additionally install `libssl-dev` and `pkg-config` to build `rover`. Install it if needed.
