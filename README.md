@@ -2,7 +2,7 @@
 
 Welcome to the Rust Programming Language course!
 
-_Moscow Institute of Technology, spring 2022. Lecturer Barinov Denis._
+_Moscow Institute of Technology, spring 2023. Lecturer Barinov Denis._
 
 ## Prerequisites
 
