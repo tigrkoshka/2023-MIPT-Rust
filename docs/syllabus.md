@@ -43,4 +43,24 @@ This document is the course syllabus. It contains the grading and lecture course
     - `Box` and `Rc`
     - `Dyn` keyword
 
+05. Cell and RefCell
+    - `Cell` implementation
+    - `RefCell` implementation
+    - `Rc` 
+
+06. Cargo and Modules
+    - Cargo versions and tools
+    - Modules and their visability
+    - `use`, `mod`, `super`, `crate` keywords
+
+07. CLosures
+    - Closure types
+    - `Fn`, `FnMut`, `FnOnce`
+    - Function pointers and items
+
+08. Lifetimes
+    - Definition
+    - Example for structures, functions, traits, etc.
+    - Elision rules
+
 ### [Additional reading](reading-list.md)
