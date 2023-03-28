@@ -1,5 +1,5 @@
 grade:
-  image: "rust:latest"
+  image: registry.gitlab.atp-fivt.org/rust2023/container
   script:
     - /grade.sh $CI_COMMIT_REF_NAME $CI_PROJECT_DIR
   timeout: 10 minutes
