@@ -19,6 +19,7 @@ _Moscow Institute of Technology, spring 2023. Lecturer Barinov Denis._
 - [How to code and send tasks to CI?](docs/solving.md)
 - [Additional reading](docs/reading-list.md)
 - [Lectures presentations and sources](lectures)
+- [Deadlines](docs/deadlines.md)
 
 ## Big thanks
 
