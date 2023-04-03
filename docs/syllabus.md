@@ -63,4 +63,9 @@ This document is the course syllabus. It contains the grading and lecture course
     - Example for structures, functions, traits, etc.
     - Elision rules
 
+09. Channels
+    - Definition 
+    - Basic implementation (using `Mutex` and `Condvar`)
+    - Flavours
+
 ### [Additional reading](reading-list.md)
