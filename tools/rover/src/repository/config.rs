@@ -100,6 +100,11 @@ impl Config {
         for pattern in patterns {
             let pattern = workdir.join(pattern).to_path_buf();
             let pattern = pattern.to_str().context("non-utf-8 path")?;
+            let pattern = if cfg!(target_os = "windows") {
+                &pattern[r#"\\?\"#.len()..]
+            } else {
+                pattern
+            };
             for entry in glob_with(pattern, options).context("pattern is invalid")? {
                 let entry = entry?;
                 absolute_user_files.push(entry.clone());
