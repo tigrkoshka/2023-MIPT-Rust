@@ -17,7 +17,12 @@ members = [
     "problems/borrowing/pstack",
     "problems/borrowing/context",
     "problems/borrowing/bst",
-
+    "problems/macros/fswalk",
+    "problems/macros/gc",
+    "problems/macros-2/orm",
+    "problems/parallel/thread-pool",
+    "problems/parallel/pargrep",
+    "problems/parallel/tcp-proxy",
 
     # Tools
     "tools/rover",
