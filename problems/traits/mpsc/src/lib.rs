@@ -1,13 +1,8 @@
 #![forbid(unsafe_code)]
 
-use std::{cell::RefCell, collections::VecDeque, fmt::Debug, rc::Rc};
+use crate::ReceiveError::{Closed, Empty};
+use std::{cell::RefCell, collections::vec_deque::VecDeque, fmt::Debug, rc::Rc, rc::Weak};
 use thiserror::Error;
-
-////////////////////////////////////////////////////////////////////////////////
-
-// TODO: your code goes here.
-
-////////////////////////////////////////////////////////////////////////////////
 
 #[derive(Error, Debug)]
 #[error("channel is closed")]
@@ -16,38 +11,39 @@ pub struct SendError<T> {
 }
 
 pub struct Sender<T> {
-    // TODO: your code goes here.
+    queue: Weak<RefCell<VecDeque<T>>>,
 }
 
 impl<T> Sender<T> {
     pub fn send(&self, value: T) -> Result<(), SendError<T>> {
-        // TODO: your code goes here.
-        unimplemented!()
+        match self.queue.upgrade() {
+            None => Err(SendError { value }),
+            Some(rc) => {
+                rc.borrow_mut().push_back(value);
+                Ok(())
+            }
+        }
     }
 
     pub fn is_closed(&self) -> bool {
-        // TODO: your code goes here.
-        unimplemented!()
+        self.queue.upgrade().is_none()
     }
 
     pub fn same_channel(&self, other: &Self) -> bool {
-        // TODO: your code goes here.
-        unimplemented!()
+        self.queue.ptr_eq(&other.queue)
     }
 }
 
 impl<T> Clone for Sender<T> {
     fn clone(&self) -> Self {
-        // TODO: your code goes here.
-        unimplemented!()
+        Sender {
+            queue: self.queue.clone(),
+        }
     }
 }
 
 impl<T> Drop for Sender<T> {
-    fn drop(&mut self) {
-        // TODO: your code goes here.
-        unimplemented!()
-    }
+    fn drop(&mut self) {}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -61,31 +57,61 @@ pub enum ReceiveError {
 }
 
 pub struct Receiver<T> {
-    // TODO: your code goes here.
+    queue: Option<Rc<RefCell<VecDeque<T>>>>,
+    leftovers: Option<VecDeque<T>>,
 }
 
 impl<T> Receiver<T> {
     pub fn recv(&mut self) -> Result<T, ReceiveError> {
-        // TODO: your code goes here.
-        unimplemented!()
+        if let Some(rc) = &self.queue {
+            if Rc::weak_count(rc) == 0 {
+                self.close()
+            }
+        }
+
+        match &self.queue {
+            Some(rc) => match rc.borrow_mut().pop_front() {
+                Some(value) => Ok(value),
+                None => Err(Empty),
+            },
+            None => match &mut self.leftovers {
+                None => Err(Closed),
+                Some(vec) => match vec.pop_front() {
+                    Some(value) => Ok(value),
+                    None => Err(Closed),
+                },
+            },
+        }
     }
 
     pub fn close(&mut self) {
-        // TODO: your code goes here.
-        unimplemented!()
+        let mut leftovers = VecDeque::new();
+        if let Some(rc) = &self.queue {
+            while let Some(x) = rc.borrow_mut().pop_front() {
+                leftovers.push_back(x);
+            }
+        }
+        self.queue = None;
+        self.leftovers = Some(leftovers);
     }
 }
 
 impl<T> Drop for Receiver<T> {
     fn drop(&mut self) {
-        // TODO: your code goes here.
-        unimplemented!()
+        self.close();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 pub fn channel<T>() -> (Sender<T>, Receiver<T>) {
-    // TODO: your code goes here.
-    unimplemented!()
+    let rc = Rc::new(RefCell::new(VecDeque::new()));
+    let sender = Sender {
+        queue: Rc::downgrade(&rc),
+    };
+    let receiver = Receiver {
+        queue: Some(rc),
+        leftovers: None,
+    };
+    (sender, receiver)
 }

@@ -2,7 +2,7 @@
 
 use std::io::{BufRead, Write};
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use log::*;
 
 use crate::gzip::GzipReader;
@@ -13,7 +13,7 @@ mod gzip;
 mod huffman_coding;
 mod tracking_writer;
 
-pub fn decompress<R: BufRead, W: Write>(input: R, mut output: W) -> Result<()> {
-    // TODO: your code goes here.
-    unimplemented!()
+pub fn decompress<R: BufRead, W: Write>(input: R, output: W) -> Result<()> {
+    log!(Level::Info, "decompressing");
+    GzipReader::new(input, output).read()
 }

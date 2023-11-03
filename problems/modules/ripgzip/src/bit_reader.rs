@@ -1,5 +1,6 @@
 #![forbid(unsafe_code)]
 
+use byteorder::ReadBytesExt;
 use std::io::{self, BufRead};
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -12,24 +13,44 @@ pub struct BitSequence {
 
 impl BitSequence {
     pub fn new(bits: u16, len: u8) -> Self {
-        // NB: make sure to zero unused bits so that Eq and Hash work as expected.
-        // TODO: your code goes here.
-        unimplemented!()
+        assert!(len <= 16);
+
+        Self {
+            // zero unused bits
+            bits: bits
+                .overflowing_shl(16 - len as u32)
+                .0
+                .overflowing_shr(16 - len as u32)
+                .0,
+            len,
+        }
     }
 
     pub fn bits(&self) -> u16 {
-        // TODO: your code goes here.
-        unimplemented!()
+        self.bits
     }
 
     pub fn len(&self) -> u8 {
-        // TODO: your code goes here.
-        unimplemented!()
+        self.len
+    }
+
+    pub fn drop_low(&mut self, k: u8) -> u16 {
+        assert!(k <= self.len);
+
+        let to_ret = self.bits & (1u16.overflowing_shl(k as u32).0 - 1);
+        self.bits = self.bits.overflowing_shr(k as u32).0;
+        self.len -= k;
+
+        to_ret
     }
 
     pub fn concat(self, other: Self) -> Self {
-        // TODO: your code goes here.
-        unimplemented!()
+        assert!(self.len + other.len <= 16);
+
+        BitSequence {
+            bits: (self.bits.overflowing_shl(other.len as u32).0) | other.bits,
+            len: self.len + other.len,
+        }
     }
 }
 
@@ -37,25 +58,54 @@ impl BitSequence {
 
 pub struct BitReader<T> {
     stream: T,
-    // TODO: your code goes here.
+    leftover: BitSequence,
 }
 
 impl<T: BufRead> BitReader<T> {
     pub fn new(stream: T) -> Self {
-        // TODO: your code goes here.
-        unimplemented!()
+        Self {
+            stream,
+            leftover: BitSequence::new(0, 0),
+        }
     }
 
-    pub fn read_bits(&mut self, mut len: u8) -> io::Result<BitSequence> {
-        // TODO: your code goes here.
-        unimplemented!()
+    pub fn read_bits(&mut self, len: u8) -> io::Result<BitSequence> {
+        assert!(len <= 16);
+
+        if self.leftover.len() >= len {
+            return Ok(BitSequence::new(self.leftover.drop_low(len), len));
+        }
+
+        let mut to_ret = self.leftover.bits();
+        let mut read_len = self.leftover.len();
+
+        let mut next_byte = self.stream.read_u8()?;
+
+        if len - read_len > 8 {
+            to_ret += (next_byte as u16).overflowing_shl(read_len as u32).0;
+            read_len += 8;
+
+            next_byte = self.stream.read_u8()?;
+        }
+
+        self.leftover = BitSequence::new(next_byte as u16, 8);
+        to_ret += self
+            .leftover
+            .drop_low(len - read_len)
+            .overflowing_shl(read_len as u32)
+            .0;
+        Ok(BitSequence::new(to_ret, len))
     }
 
     /// Discard all the unread bits in the current byte and return a mutable reference
     /// to the underlying reader.
     pub fn borrow_reader_from_boundary(&mut self) -> &mut T {
-        // TODO: your code goes here.
-        unimplemented!()
+        self.leftover = BitSequence::new(0, 0);
+        &mut self.stream
+    }
+
+    pub fn inner(self) -> T {
+        self.stream
     }
 }
 

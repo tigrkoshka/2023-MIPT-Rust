@@ -8,6 +8,9 @@
 # VS Code settings
 **/.vscode
 
+# CLion settings
+**/.idea
+
 # MacOS useless DS_Store
 **/.DS_Store
 
